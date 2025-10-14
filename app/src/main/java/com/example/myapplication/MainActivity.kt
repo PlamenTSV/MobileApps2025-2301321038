@@ -1,5 +1,6 @@
 package com.example.myapplication
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -7,8 +8,10 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Restaurant
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -22,19 +25,34 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            MyApplicationTheme {
+            var isDarkTheme by remember { mutableStateOf(false) }
+            
+            MyApplicationTheme(darkTheme = isDarkTheme) {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     RestaurantHomeScreen(
+                        isDarkTheme = isDarkTheme,
+                        onThemeToggle = { isDarkTheme = !isDarkTheme },
+                        onViewMenuClick = { navigateToMealDetails() },
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
             }
         }
     }
+    
+    private fun navigateToMealDetails() {
+        val intent = Intent(this, MealDetailsActivity::class.java)
+        startActivity(intent)
+    }
 }
 
 @Composable
-fun RestaurantHomeScreen(modifier: Modifier = Modifier) {
+fun RestaurantHomeScreen(
+    isDarkTheme: Boolean,
+    onThemeToggle: () -> Unit,
+    onViewMenuClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -42,6 +60,19 @@ fun RestaurantHomeScreen(modifier: Modifier = Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
+        ) {
+            IconButton(onClick = onThemeToggle) {
+                Icon(
+                    imageVector = if (isDarkTheme) Icons.Default.LightMode else Icons.Default.DarkMode,
+                    contentDescription = if (isDarkTheme) "Switch to Light Mode" else "Switch to Dark Mode",
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
+        
         Icon(
             imageVector = Icons.Default.Restaurant,
             contentDescription = "Restaurant Icon",
@@ -62,7 +93,7 @@ fun RestaurantHomeScreen(modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.height(16.dp))
         
         Text(
-            text = "Welcome to our delicious world!",
+            text = "Welcome to our culinary experience!",
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onBackground,
             textAlign = TextAlign.Center
@@ -71,11 +102,20 @@ fun RestaurantHomeScreen(modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.height(8.dp))
         
         Text(
-            text = "Discover amazing dishes from our menu",
+            text = "Explore our delicious menu offerings",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
             textAlign = TextAlign.Center
         )
+        
+        Spacer(modifier = Modifier.height(32.dp))
+        
+        Button(
+            onClick = onViewMenuClick,
+            modifier = Modifier.fillMaxWidth(0.6f)
+        ) {
+            Text("View Menu")
+        }
     }
 }
 
@@ -83,7 +123,11 @@ fun RestaurantHomeScreen(modifier: Modifier = Modifier) {
 @Composable
 fun RestaurantHomeScreenPreview() {
     MyApplicationTheme(darkTheme = false) {
-        RestaurantHomeScreen()
+        RestaurantHomeScreen(
+            isDarkTheme = false,
+            onThemeToggle = {},
+            onViewMenuClick = {}
+        )
     }
 }
 
@@ -91,6 +135,10 @@ fun RestaurantHomeScreenPreview() {
 @Composable
 fun RestaurantHomeScreenDarkPreview() {
     MyApplicationTheme(darkTheme = true) {
-        RestaurantHomeScreen()
+        RestaurantHomeScreen(
+            isDarkTheme = true,
+            onThemeToggle = {},
+            onViewMenuClick = {}
+        )
     }
 }

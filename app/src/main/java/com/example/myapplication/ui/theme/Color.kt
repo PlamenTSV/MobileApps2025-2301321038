@@ -2,13 +2,13 @@ package com.example.myapplication.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val OrangeRed = Color(0xFFFF6B35)
-val WarmBrown = Color(0xFF8B4513)
-val GoldenYellow = Color(0xFFFFA500)
+val PrimaryOrange = Color(0xFFFF5722)
+val SecondaryBrown = Color(0xFF795548)
+val AccentYellow = Color(0xFFFFC107)
 
-val LightOrange = Color(0xFFFFB399)
-val LightBrown = Color(0xFFCD853F)
-val LightGold = Color(0xFFFFD700)
+val DarkPrimaryOrange = Color(0xFFFFCC80)
+val DarkSecondaryBrown = Color(0xFFA1887F)
+val DarkAccentYellow = Color(0xFFFFF176)
 
-val CreamBackground = Color(0xFFFFF8F0)
-val DarkCharcoal = Color(0xFF2C2C2C)
+val LightBackground = Color(0xFFFFFBFE)
+val DarkBackground = Color(0xFF1C1B1F)
