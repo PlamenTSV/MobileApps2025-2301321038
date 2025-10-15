@@ -6,10 +6,13 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.LightMode
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,20 +22,41 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.ui.theme.MyApplicationTheme
+import com.example.myapplication.database.AppDatabase
+import com.example.myapplication.database.MealEntity
 
 class MainActivity : ComponentActivity() {
+    private lateinit var themeManager: ThemeManager
+    private lateinit var database: AppDatabase
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        
+        themeManager = ThemeManager(this)
+        database = AppDatabase.getDatabase(this)
+        
         setContent {
-            var isDarkTheme by remember { mutableStateOf(false) }
+            var isDarkTheme by remember { mutableStateOf(themeManager.isDarkTheme()) }
+            val meals by database.mealDao().getAllMeals().collectAsState(initial = emptyList())
             
             MyApplicationTheme(darkTheme = isDarkTheme) {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    RestaurantHomeScreen(
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    floatingActionButton = {
+                        FloatingActionButton(onClick = { navigateToAddMeal() }) {
+                            Icon(Icons.Default.Add, contentDescription = "Add")
+                        }
+                    }
+                ) { innerPadding ->
+                    MealListScreen(
+                        meals = meals,
                         isDarkTheme = isDarkTheme,
-                        onThemeToggle = { isDarkTheme = !isDarkTheme },
-                        onViewMenuClick = { navigateToMealDetails() },
+                        onThemeToggle = { 
+                            isDarkTheme = !isDarkTheme
+                            themeManager.setDarkTheme(isDarkTheme)
+                        },
+                        onMealClick = { navigateToMealDetails() },
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -41,104 +65,80 @@ class MainActivity : ComponentActivity() {
     }
     
     private fun navigateToMealDetails() {
-        val intent = Intent(this, MealDetailsActivity::class.java)
-        startActivity(intent)
+        startActivity(Intent(this, MealDetailsActivity::class.java))
+    }
+    
+    private fun navigateToAddMeal() {
+        startActivity(Intent(this, AddMealActivity::class.java))
     }
 }
 
 @Composable
-fun RestaurantHomeScreen(
+fun MealListScreen(
+    meals: List<MealEntity>,
     isDarkTheme: Boolean,
     onThemeToggle: () -> Unit,
-    onViewMenuClick: () -> Unit,
+    onMealClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Row(
+    Column(modifier = modifier.fillMaxSize()) {
+        Surface(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End
+            color = MaterialTheme.colorScheme.surface,
+            shadowElevation = 4.dp
         ) {
-            IconButton(onClick = onThemeToggle) {
-                Icon(
-                    imageVector = if (isDarkTheme) Icons.Default.LightMode else Icons.Default.DarkMode,
-                    contentDescription = if (isDarkTheme) "Switch to Light Mode" else "Switch to Dark Mode",
-                    tint = MaterialTheme.colorScheme.primary
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Restaurant Menu",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.weight(1f)
                 )
+                IconButton(onClick = onThemeToggle) {
+                    Icon(
+                        imageVector = if (isDarkTheme) Icons.Default.LightMode else Icons.Default.DarkMode,
+                        contentDescription = if (isDarkTheme) "Light" else "Dark"
+                    )
+                }
             }
         }
         
-        Icon(
-            imageVector = Icons.Default.Restaurant,
-            contentDescription = "Restaurant Icon",
-            modifier = Modifier.size(80.dp),
-            tint = MaterialTheme.colorScheme.primary
-        )
-        
-        Spacer(modifier = Modifier.height(24.dp))
-        
-        Text(
-            text = "Restaurant Menu",
-            style = MaterialTheme.typography.headlineLarge,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary,
-            textAlign = TextAlign.Center
-        )
-        
-        Spacer(modifier = Modifier.height(16.dp))
-        
-        Text(
-            text = "Welcome to our culinary experience!",
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onBackground,
-            textAlign = TextAlign.Center
-        )
-        
-        Spacer(modifier = Modifier.height(8.dp))
-        
-        Text(
-            text = "Explore our delicious menu offerings",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
-            textAlign = TextAlign.Center
-        )
-        
-        Spacer(modifier = Modifier.height(32.dp))
-        
-        Button(
-            onClick = onViewMenuClick,
-            modifier = Modifier.fillMaxWidth(0.6f)
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(vertical = 8.dp)
         ) {
-            Text("View Menu")
+            items(meals) { meal ->
+                MealItem(meal = meal, onClick = onMealClick)
+            }
         }
     }
 }
 
 @Preview(showBackground = true, name = "Light Theme")
 @Composable
-fun RestaurantHomeScreenPreview() {
+fun MealListScreenPreview() {
     MyApplicationTheme(darkTheme = false) {
-        RestaurantHomeScreen(
+        MealListScreen(
+            meals = emptyList(),
             isDarkTheme = false,
             onThemeToggle = {},
-            onViewMenuClick = {}
+            onMealClick = {}
         )
     }
 }
 
 @Preview(showBackground = true, name = "Dark Theme")
 @Composable
-fun RestaurantHomeScreenDarkPreview() {
+fun MealListScreenDarkPreview() {
     MyApplicationTheme(darkTheme = true) {
-        RestaurantHomeScreen(
+        MealListScreen(
+            meals = emptyList(),
             isDarkTheme = true,
             onThemeToggle = {},
-            onViewMenuClick = {}
+            onMealClick = {}
         )
     }
 }
