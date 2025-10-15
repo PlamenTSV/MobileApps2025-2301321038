@@ -5,9 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.DarkMode
@@ -16,37 +14,52 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.ui.theme.MyApplicationTheme
-import kotlin.math.abs
+import com.example.myapplication.database.AppDatabase
+import com.example.myapplication.database.MealEntity
+
 
 class MealDetailsActivity : ComponentActivity() {
     private lateinit var themeManager: ThemeManager
+    private lateinit var database: AppDatabase
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         
         themeManager = ThemeManager(this)
+        database = AppDatabase.getDatabase(this)
+        
+        val mealId = intent.getIntExtra("mealId", -1)
         
         setContent {
             var isDarkTheme by remember { mutableStateOf(themeManager.isDarkTheme()) }
+            val meals by database.mealDao().getAllMeals().collectAsState(initial = emptyList())
+            val meal = meals.find { it.id == mealId }
             
             MyApplicationTheme(darkTheme = isDarkTheme) {
-                MealDetailsScreen(
-                    isDarkTheme = isDarkTheme,
-                    onThemeToggle = { 
-                        isDarkTheme = !isDarkTheme
-                        themeManager.setDarkTheme(isDarkTheme)
-                    },
-                    onBackClick = { finish() }
-                )
+                if (meal != null) {
+                    MealDetailsScreen(
+                        meal = meal,
+                        isDarkTheme = isDarkTheme,
+                        onThemeToggle = { 
+                            isDarkTheme = !isDarkTheme
+                            themeManager.setDarkTheme(isDarkTheme)
+                        },
+                        onBackClick = { finish() }
+                    )
+                } else {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("Meal not found")
+                    }
+                }
             }
         }
     }
@@ -54,14 +67,12 @@ class MealDetailsActivity : ComponentActivity() {
 
 @Composable
 fun MealDetailsScreen(
+    meal: MealEntity,
     isDarkTheme: Boolean,
     onThemeToggle: () -> Unit,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var currentMealIndex by remember { mutableStateOf(0) }
-    val meals = SampleMeals.meals
-    
     Scaffold(
         topBar = {
             Surface(
@@ -70,102 +81,48 @@ fun MealDetailsScreen(
                 shadowElevation = 4.dp
             ) {
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     IconButton(onClick = onBackClick) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back"
-                        )
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
-                    Spacer(modifier = Modifier.weight(1f))
                     Text(
-                        text = "Meal ${currentMealIndex + 1} of ${meals.size}",
+                        text = "Meal Details",
                         style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Medium
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier.weight(1f)
                     )
-                    Spacer(modifier = Modifier.weight(1f))
                     IconButton(onClick = onThemeToggle) {
                         Icon(
                             imageVector = if (isDarkTheme) Icons.Default.LightMode else Icons.Default.DarkMode,
-                            contentDescription = if (isDarkTheme) "Switch to Light Mode" else "Switch to Dark Mode"
+                            contentDescription = if (isDarkTheme) "Light" else "Dark"
                         )
                     }
                 }
             }
         }
     ) { innerPadding ->
-        Column(
+        MealPage(
+            meal = meal,
             modifier = modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .pointerInput(Unit) {
-                        detectDragGestures { _, dragAmount ->
-                            if (abs(dragAmount.x) > abs(dragAmount.y)) {
-                                if (dragAmount.x > 50 && currentMealIndex > 0) {
-                                    currentMealIndex--
-                                } else if (dragAmount.x < -50 && currentMealIndex < meals.size - 1) {
-                                    currentMealIndex++
-                                }
-                            }
-                        }
-                    }
-            ) {
-                MealPage(
-                    meal = meals[currentMealIndex],
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
-            
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                repeat(meals.size) { index ->
-                    val isSelected = currentMealIndex == index
-                    Box(
-                        modifier = Modifier
-                            .size(12.dp)
-                            .clip(CircleShape)
-                            .background(
-                                if (isSelected) 
-                                    MaterialTheme.colorScheme.primary 
-                                else 
-                                    MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
-                            )
-                    )
-                }
-            }
-        }
+        )
     }
 }
 
 @Composable
 fun MealPage(
-    meal: Meal,
+    meal: MealEntity,
     modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(24.dp),
+        modifier = modifier.fillMaxSize().padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp),
+            modifier = Modifier.fillMaxWidth().height(200.dp),
             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
         ) {
             Box(
@@ -212,9 +169,7 @@ fun MealPage(
             )
         ) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
+                modifier = Modifier.fillMaxWidth().padding(16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -239,6 +194,11 @@ fun MealPage(
 fun MealDetailsScreenPreview() {
     MyApplicationTheme {
         MealDetailsScreen(
+            meal = MealEntity(
+                name = "Test Meal",
+                description = "Test description",
+                price = 10.99
+            ),
             isDarkTheme = false,
             onThemeToggle = {},
             onBackClick = {}

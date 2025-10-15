@@ -56,7 +56,7 @@ class MainActivity : ComponentActivity() {
                             isDarkTheme = !isDarkTheme
                             themeManager.setDarkTheme(isDarkTheme)
                         },
-                        onMealClick = { navigateToMealDetails() },
+                        onMealClick = { mealId -> navigateToMealDetails(mealId) },
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -64,8 +64,10 @@ class MainActivity : ComponentActivity() {
         }
     }
     
-    private fun navigateToMealDetails() {
-        startActivity(Intent(this, MealDetailsActivity::class.java))
+    private fun navigateToMealDetails(mealId: Int) {
+        val intent = Intent(this, MealDetailsActivity::class.java)
+        intent.putExtra("mealId", mealId)
+        startActivity(intent)
     }
     
     private fun navigateToAddMeal() {
@@ -78,7 +80,7 @@ fun MealListScreen(
     meals: List<MealEntity>,
     isDarkTheme: Boolean,
     onThemeToggle: () -> Unit,
-    onMealClick: () -> Unit,
+    onMealClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier.fillMaxSize()) {
@@ -111,7 +113,7 @@ fun MealListScreen(
             contentPadding = PaddingValues(vertical = 8.dp)
         ) {
             items(meals) { meal ->
-                MealItem(meal = meal, onClick = onMealClick)
+                MealItem(meal = meal, onClick = { onMealClick(meal.id) })
             }
         }
     }
