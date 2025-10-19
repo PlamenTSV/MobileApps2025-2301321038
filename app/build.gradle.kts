@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    id("kotlin-kapt")
+    alias(libs.plugins.ksp)
     alias(libs.plugins.ktlint)
 }
 
@@ -71,7 +71,7 @@ dependencies {
     // Room database
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
-    kapt("androidx.room:room-compiler:2.6.1")
+    ksp("androidx.room:room-compiler:2.6.1")
 
     testImplementation(libs.junit)
     testImplementation("org.mockito:mockito-core:5.8.0")
