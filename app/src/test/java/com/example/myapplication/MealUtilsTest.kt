@@ -1,11 +1,10 @@
 package com.example.myapplication
 
 import com.example.myapplication.database.MealEntity
-import org.junit.Test
 import org.junit.Assert.*
+import org.junit.Test
 
 class MealUtilsTest {
-
     @Test
     fun `formatPrice should format price with 2 decimal places`() {
         assertEquals("10.99", MealUtils.formatPrice(10.99))
@@ -104,16 +103,17 @@ class MealUtilsTest {
 
     @Test
     fun `mealToEntity should convert correctly`() {
-        val meal = Meal(
-            id = 1,
-            name = "Test Meal",
-            description = "Test Description",
-            price = 10.99,
-            imageUrl = "test.jpg"
-        )
-        
+        val meal =
+            Meal(
+                id = 1,
+                name = "Test Meal",
+                description = "Test Description",
+                price = 10.99,
+                imageUrl = "test.jpg",
+            )
+
         val entity = MealUtils.mealToEntity(meal)
-        
+
         assertEquals(meal.id, entity.id)
         assertEquals(meal.name, entity.name)
         assertEquals(meal.description, entity.description)
@@ -123,16 +123,17 @@ class MealUtilsTest {
 
     @Test
     fun `entityToMeal should convert correctly`() {
-        val entity = MealEntity(
-            id = 1,
-            name = "Test Meal",
-            description = "Test Description",
-            price = 10.99,
-            imageUrl = "test.jpg"
-        )
-        
+        val entity =
+            MealEntity(
+                id = 1,
+                name = "Test Meal",
+                description = "Test Description",
+                price = 10.99,
+                imageUrl = "test.jpg",
+            )
+
         val meal = MealUtils.entityToMeal(entity)
-        
+
         assertEquals(entity.id, meal.id)
         assertEquals(entity.name, meal.name)
         assertEquals(entity.description, meal.description)
@@ -142,14 +143,15 @@ class MealUtilsTest {
 
     @Test
     fun `calculateTotalPrice should sum all meal prices`() {
-        val meals = listOf(
-            Meal(1, "Meal 1", "Description 1", 10.0),
-            Meal(2, "Meal 2", "Description 2", 15.5),
-            Meal(3, "Meal 3", "Description 3", 5.25)
-        )
-        
+        val meals =
+            listOf(
+                Meal(1, "Meal 1", "Description 1", 10.0),
+                Meal(2, "Meal 2", "Description 2", 15.5),
+                Meal(3, "Meal 3", "Description 3", 5.25),
+            )
+
         val total = MealUtils.calculateTotalPrice(meals)
-        
+
         assertEquals(30.75, total, 0.01)
     }
 
@@ -161,14 +163,15 @@ class MealUtilsTest {
 
     @Test
     fun `findMostExpensiveMeal should return meal with highest price`() {
-        val meals = listOf(
-            Meal(1, "Cheap Meal", "Description", 5.0),
-            Meal(2, "Expensive Meal", "Description", 25.0),
-            Meal(3, "Medium Meal", "Description", 15.0)
-        )
-        
+        val meals =
+            listOf(
+                Meal(1, "Cheap Meal", "Description", 5.0),
+                Meal(2, "Expensive Meal", "Description", 25.0),
+                Meal(3, "Medium Meal", "Description", 15.0),
+            )
+
         val mostExpensive = MealUtils.findMostExpensiveMeal(meals)
-        
+
         assertNotNull(mostExpensive)
         assertEquals("Expensive Meal", mostExpensive!!.name)
         assertEquals(25.0, mostExpensive.price, 0.01)
@@ -182,14 +185,15 @@ class MealUtilsTest {
 
     @Test
     fun `findCheapestMeal should return meal with lowest price`() {
-        val meals = listOf(
-            Meal(1, "Expensive Meal", "Description", 25.0),
-            Meal(2, "Cheap Meal", "Description", 5.0),
-            Meal(3, "Medium Meal", "Description", 15.0)
-        )
-        
+        val meals =
+            listOf(
+                Meal(1, "Expensive Meal", "Description", 25.0),
+                Meal(2, "Cheap Meal", "Description", 5.0),
+                Meal(3, "Medium Meal", "Description", 15.0),
+            )
+
         val cheapest = MealUtils.findCheapestMeal(meals)
-        
+
         assertNotNull(cheapest)
         assertEquals("Cheap Meal", cheapest!!.name)
         assertEquals(5.0, cheapest.price, 0.01)
@@ -203,14 +207,15 @@ class MealUtilsTest {
 
     @Test
     fun `findMostExpensiveMeal should handle equal prices`() {
-        val meals = listOf(
-            Meal(1, "Meal 1", "Description", 10.0),
-            Meal(2, "Meal 2", "Description", 10.0),
-            Meal(3, "Meal 3", "Description", 10.0)
-        )
-        
+        val meals =
+            listOf(
+                Meal(1, "Meal 1", "Description", 10.0),
+                Meal(2, "Meal 2", "Description", 10.0),
+                Meal(3, "Meal 3", "Description", 10.0),
+            )
+
         val mostExpensive = MealUtils.findMostExpensiveMeal(meals)
-        
+
         assertNotNull(mostExpensive)
         assertEquals(10.0, mostExpensive!!.price, 0.01)
     }
@@ -228,4 +233,3 @@ class MealUtilsTest {
         assertEquals("1000000.00", MealUtils.formatPrice(1000000.0))
     }
 }
-

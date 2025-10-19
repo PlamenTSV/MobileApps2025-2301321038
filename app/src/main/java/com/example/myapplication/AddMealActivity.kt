@@ -29,21 +29,21 @@ import kotlinx.coroutines.launch
 class AddMealActivity : ComponentActivity() {
     private lateinit var themeManager: ThemeManager
     private lateinit var database: AppDatabase
-    
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        
+
         themeManager = ThemeManager(this)
         database = AppDatabase.getDatabase(this)
-        
+
         setContent {
             var isDarkTheme by remember { mutableStateOf(themeManager.isDarkTheme()) }
-            
+
             MyApplicationTheme(darkTheme = isDarkTheme) {
                 AddMealScreen(
                     isDarkTheme = isDarkTheme,
-                    onThemeToggle = { 
+                    onThemeToggle = {
                         isDarkTheme = !isDarkTheme
                         themeManager.setDarkTheme(isDarkTheme)
                     },
@@ -51,12 +51,12 @@ class AddMealActivity : ComponentActivity() {
                     onSaveMeal = { meal ->
                         saveMeal(meal)
                         finish()
-                    }
+                    },
                 )
             }
         }
     }
-    
+
     private fun saveMeal(meal: MealEntity) {
         CoroutineScope(Dispatchers.IO).launch {
             database.mealDao().insertMeal(meal)
@@ -70,25 +70,25 @@ fun AddMealScreen(
     onThemeToggle: () -> Unit,
     onBackClick: () -> Unit,
     onSaveMeal: (MealEntity) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     var name by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var price by remember { mutableStateOf("") }
     var imageUrl by remember { mutableStateOf("") }
-    
+
     val isValid = name.isNotBlank() && description.isNotBlank() && price.isNotBlank()
-    
+
     Scaffold(
         topBar = {
             Surface(
                 modifier = Modifier.fillMaxWidth(),
                 color = MaterialTheme.colorScheme.surface,
-                shadowElevation = 4.dp
+                shadowElevation = 4.dp,
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     IconButton(onClick = onBackClick) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
@@ -97,76 +97,79 @@ fun AddMealScreen(
                         text = "Add New Meal",
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Medium,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
                     )
                     IconButton(onClick = onThemeToggle) {
                         Icon(
                             imageVector = if (isDarkTheme) Icons.Default.LightMode else Icons.Default.DarkMode,
-                            contentDescription = if (isDarkTheme) "Light" else "Dark"
+                            contentDescription = if (isDarkTheme) "Light" else "Dark",
                         )
                     }
                 }
             }
-        }
+        },
     ) { innerPadding ->
         Column(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .padding(24.dp)
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier =
+                modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .padding(24.dp)
+                    .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
                 label = { Text("Meal Name") },
                 modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                singleLine = true,
             )
-            
+
             OutlinedTextField(
                 value = description,
                 onValueChange = { description = it },
                 label = { Text("Description") },
                 modifier = Modifier.fillMaxWidth(),
-                minLines = 3
+                minLines = 3,
             )
-            
+
             OutlinedTextField(
                 value = price,
                 onValueChange = { price = it },
                 label = { Text("Price") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
-                keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
-                    keyboardType = KeyboardType.Decimal
-                ),
-                prefix = { Text("$") }
+                keyboardOptions =
+                    androidx.compose.foundation.text.KeyboardOptions(
+                        keyboardType = KeyboardType.Decimal,
+                    ),
+                prefix = { Text("$") },
             )
-            
+
             OutlinedTextField(
                 value = imageUrl,
                 onValueChange = { imageUrl = it },
                 label = { Text("Image URL (Optional)") },
                 modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                singleLine = true,
             )
-            
+
             Spacer(modifier = Modifier.height(16.dp))
-            
+
             Button(
                 onClick = {
-                    val meal = MealEntity(
-                        name = name.trim(),
-                        description = description.trim(),
-                        price = price.toDoubleOrNull() ?: 0.0,
-                        imageUrl = imageUrl.trim()
-                    )
+                    val meal =
+                        MealEntity(
+                            name = name.trim(),
+                            description = description.trim(),
+                            price = price.toDoubleOrNull() ?: 0.0,
+                            imageUrl = imageUrl.trim(),
+                        )
                     onSaveMeal(meal)
                 },
                 modifier = Modifier.fillMaxWidth(),
-                enabled = isValid
+                enabled = isValid,
             ) {
                 Text("Save Meal")
             }
@@ -182,7 +185,7 @@ fun AddMealScreenPreview() {
             isDarkTheme = false,
             onThemeToggle = {},
             onBackClick = {},
-            onSaveMeal = {}
+            onSaveMeal = {},
         )
     }
 }

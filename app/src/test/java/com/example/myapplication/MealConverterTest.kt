@@ -1,23 +1,23 @@
 package com.example.myapplication
 
 import com.example.myapplication.database.MealEntity
-import org.junit.Test
 import org.junit.Assert.*
+import org.junit.Test
 
 class MealConverterTest {
-
     @Test
     fun `convertToEntity should convert Meal to MealEntity correctly`() {
-        val meal = Meal(
-            id = 1,
-            name = "Test Meal",
-            description = "Test Description",
-            price = 10.99,
-            imageUrl = "test.jpg"
-        )
-        
+        val meal =
+            Meal(
+                id = 1,
+                name = "Test Meal",
+                description = "Test Description",
+                price = 10.99,
+                imageUrl = "test.jpg",
+            )
+
         val entity = MealConverter.convertToEntity(meal)
-        
+
         assertEquals(meal.id, entity.id)
         assertEquals(meal.name, entity.name)
         assertEquals(meal.description, entity.description)
@@ -27,16 +27,17 @@ class MealConverterTest {
 
     @Test
     fun `convertToEntity should trim whitespace`() {
-        val meal = Meal(
-            id = 1,
-            name = "  Test Meal  ",
-            description = "  Test Description  ",
-            price = 10.99,
-            imageUrl = "  test.jpg  "
-        )
-        
+        val meal =
+            Meal(
+                id = 1,
+                name = "  Test Meal  ",
+                description = "  Test Description  ",
+                price = 10.99,
+                imageUrl = "  test.jpg  ",
+            )
+
         val entity = MealConverter.convertToEntity(meal)
-        
+
         assertEquals("Test Meal", entity.name)
         assertEquals("Test Description", entity.description)
         assertEquals("test.jpg", entity.imageUrl)
@@ -44,16 +45,17 @@ class MealConverterTest {
 
     @Test
     fun `convertToMeal should convert MealEntity to Meal correctly`() {
-        val entity = MealEntity(
-            id = 1,
-            name = "Test Meal",
-            description = "Test Description",
-            price = 10.99,
-            imageUrl = "test.jpg"
-        )
-        
+        val entity =
+            MealEntity(
+                id = 1,
+                name = "Test Meal",
+                description = "Test Description",
+                price = 10.99,
+                imageUrl = "test.jpg",
+            )
+
         val meal = MealConverter.convertToMeal(entity)
-        
+
         assertEquals(entity.id, meal.id)
         assertEquals(entity.name, meal.name)
         assertEquals(entity.description, meal.description)
@@ -63,13 +65,14 @@ class MealConverterTest {
 
     @Test
     fun `convertListToEntities should convert list of Meals`() {
-        val meals = listOf(
-            Meal(1, "Meal 1", "Description 1", 10.0),
-            Meal(2, "Meal 2", "Description 2", 15.0)
-        )
-        
+        val meals =
+            listOf(
+                Meal(1, "Meal 1", "Description 1", 10.0),
+                Meal(2, "Meal 2", "Description 2", 15.0),
+            )
+
         val entities = MealConverter.convertListToEntities(meals)
-        
+
         assertEquals(2, entities.size)
         assertEquals(meals[0].id, entities[0].id)
         assertEquals(meals[1].id, entities[1].id)
@@ -77,13 +80,14 @@ class MealConverterTest {
 
     @Test
     fun `convertListToMeals should convert list of MealEntities`() {
-        val entities = listOf(
-            MealEntity(1, "Meal 1", "Description 1", 10.0),
-            MealEntity(2, "Meal 2", "Description 2", 15.0)
-        )
-        
+        val entities =
+            listOf(
+                MealEntity(1, "Meal 1", "Description 1", 10.0),
+                MealEntity(2, "Meal 2", "Description 2", 15.0),
+            )
+
         val meals = MealConverter.convertListToMeals(entities)
-        
+
         assertEquals(2, meals.size)
         assertEquals(entities[0].id, meals[0].id)
         assertEquals(entities[1].id, meals[1].id)
@@ -123,13 +127,14 @@ class MealConverterTest {
 
     @Test
     fun `createMealEntityFromInputs should create entity with sanitized inputs`() {
-        val entity = MealConverter.createMealEntityFromInputs(
-            name = "  Test Meal  ",
-            description = "  Test Description  ",
-            price = 10.123456,
-            imageUrl = "  test.jpg  "
-        )
-        
+        val entity =
+            MealConverter.createMealEntityFromInputs(
+                name = "  Test Meal  ",
+                description = "  Test Description  ",
+                price = 10.123456,
+                imageUrl = "  test.jpg  ",
+            )
+
         assertEquals("Test Meal", entity.name)
         assertEquals("Test Description", entity.description)
         assertEquals(10.12, entity.price, 0.01)
@@ -138,31 +143,34 @@ class MealConverterTest {
 
     @Test
     fun `createMealEntityFromInputs should use default empty imageUrl`() {
-        val entity = MealConverter.createMealEntityFromInputs(
-            name = "Test Meal",
-            description = "Test Description",
-            price = 10.99
-        )
-        
+        val entity =
+            MealConverter.createMealEntityFromInputs(
+                name = "Test Meal",
+                description = "Test Description",
+                price = 10.99,
+            )
+
         assertEquals("", entity.imageUrl)
     }
 
     @Test
     fun `updateMealEntity should update only provided fields`() {
-        val originalEntity = MealEntity(
-            id = 1,
-            name = "Original Name",
-            description = "Original Description",
-            price = 10.0,
-            imageUrl = "original.jpg"
-        )
-        
-        val updatedEntity = MealConverter.updateMealEntity(
-            originalEntity,
-            name = "Updated Name",
-            price = 15.0
-        )
-        
+        val originalEntity =
+            MealEntity(
+                id = 1,
+                name = "Original Name",
+                description = "Original Description",
+                price = 10.0,
+                imageUrl = "original.jpg",
+            )
+
+        val updatedEntity =
+            MealConverter.updateMealEntity(
+                originalEntity,
+                name = "Updated Name",
+                price = 15.0,
+            )
+
         assertEquals("Updated Name", updatedEntity.name)
         assertEquals("Original Description", updatedEntity.description)
         assertEquals(15.0, updatedEntity.price, 0.01)
@@ -171,16 +179,17 @@ class MealConverterTest {
 
     @Test
     fun `updateMealEntity should not change fields when null provided`() {
-        val originalEntity = MealEntity(
-            id = 1,
-            name = "Original Name",
-            description = "Original Description",
-            price = 10.0,
-            imageUrl = "original.jpg"
-        )
-        
+        val originalEntity =
+            MealEntity(
+                id = 1,
+                name = "Original Name",
+                description = "Original Description",
+                price = 10.0,
+                imageUrl = "original.jpg",
+            )
+
         val updatedEntity = MealConverter.updateMealEntity(originalEntity)
-        
+
         assertEquals(originalEntity.name, updatedEntity.name)
         assertEquals(originalEntity.description, updatedEntity.description)
         assertEquals(originalEntity.price, updatedEntity.price, 0.01)
@@ -189,21 +198,23 @@ class MealConverterTest {
 
     @Test
     fun `updateMealEntity should sanitize updated fields`() {
-        val originalEntity = MealEntity(
-            id = 1,
-            name = "Original Name",
-            description = "Original Description",
-            price = 10.0,
-            imageUrl = "original.jpg"
-        )
-        
-        val updatedEntity = MealConverter.updateMealEntity(
-            originalEntity,
-            name = "  Updated Name  ",
-            description = "  Updated Description  ",
-            imageUrl = "  updated.jpg  "
-        )
-        
+        val originalEntity =
+            MealEntity(
+                id = 1,
+                name = "Original Name",
+                description = "Original Description",
+                price = 10.0,
+                imageUrl = "original.jpg",
+            )
+
+        val updatedEntity =
+            MealConverter.updateMealEntity(
+                originalEntity,
+                name = "  Updated Name  ",
+                description = "  Updated Description  ",
+                imageUrl = "  updated.jpg  ",
+            )
+
         assertEquals("Updated Name", updatedEntity.name)
         assertEquals("Updated Description", updatedEntity.description)
         assertEquals("updated.jpg", updatedEntity.imageUrl)
@@ -241,27 +252,29 @@ class MealConverterTest {
 
     @Test
     fun `createMealEntityFromInputs should handle zero price`() {
-        val entity = MealConverter.createMealEntityFromInputs(
-            name = "Free Meal",
-            description = "No cost meal",
-            price = 0.0
-        )
-        
+        val entity =
+            MealConverter.createMealEntityFromInputs(
+                name = "Free Meal",
+                description = "No cost meal",
+                price = 0.0,
+            )
+
         assertEquals(0.0, entity.price, 0.01)
     }
 
     @Test
     fun `convertToEntity should handle meal with empty strings`() {
-        val meal = Meal(
-            id = 1,
-            name = "",
-            description = "",
-            price = 0.0,
-            imageUrl = ""
-        )
-        
+        val meal =
+            Meal(
+                id = 1,
+                name = "",
+                description = "",
+                price = 0.0,
+                imageUrl = "",
+            )
+
         val entity = MealConverter.convertToEntity(meal)
-        
+
         assertEquals("", entity.name)
         assertEquals("", entity.description)
         assertEquals("", entity.imageUrl)
@@ -269,19 +282,19 @@ class MealConverterTest {
 
     @Test
     fun `convertToMeal should handle entity with empty strings`() {
-        val entity = MealEntity(
-            id = 1,
-            name = "",
-            description = "",
-            price = 0.0,
-            imageUrl = ""
-        )
-        
+        val entity =
+            MealEntity(
+                id = 1,
+                name = "",
+                description = "",
+                price = 0.0,
+                imageUrl = "",
+            )
+
         val meal = MealConverter.convertToMeal(entity)
-        
+
         assertEquals("", meal.name)
         assertEquals("", meal.description)
         assertEquals("", meal.imageUrl)
     }
 }
-

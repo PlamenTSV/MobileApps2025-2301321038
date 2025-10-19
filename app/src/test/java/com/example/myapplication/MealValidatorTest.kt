@@ -1,11 +1,10 @@
 package com.example.myapplication
 
 import com.example.myapplication.database.MealEntity
-import org.junit.Test
 import org.junit.Assert.*
+import org.junit.Test
 
 class MealValidatorTest {
-
     @Test
     fun `validateMealName should return success for valid names`() {
         assertTrue(MealValidator.validateMealName("Pizza").isSuccess())
@@ -95,24 +94,26 @@ class MealValidatorTest {
 
     @Test
     fun `validateMeal should return success for valid meal`() {
-        val meal = MealEntity(
-            name = "Valid Meal",
-            description = "This is a valid description",
-            price = 12.99
-        )
-        
+        val meal =
+            MealEntity(
+                name = "Valid Meal",
+                description = "This is a valid description",
+                price = 12.99,
+            )
+
         val result = MealValidator.validateMeal(meal)
         assertTrue(result.isSuccess())
     }
 
     @Test
     fun `validateMeal should return error for invalid name`() {
-        val meal = MealEntity(
-            name = "A",
-            description = "This is a valid description",
-            price = 12.99
-        )
-        
+        val meal =
+            MealEntity(
+                name = "A",
+                description = "This is a valid description",
+                price = 12.99,
+            )
+
         val result = MealValidator.validateMeal(meal)
         assertTrue(result.isError())
         assertEquals("Meal name must be at least 2 characters", result.getErrorMessage())
@@ -120,12 +121,13 @@ class MealValidatorTest {
 
     @Test
     fun `validateMeal should return error for invalid description`() {
-        val meal = MealEntity(
-            name = "Valid Meal",
-            description = "Short",
-            price = 12.99
-        )
-        
+        val meal =
+            MealEntity(
+                name = "Valid Meal",
+                description = "Short",
+                price = 12.99,
+            )
+
         val result = MealValidator.validateMeal(meal)
         assertTrue(result.isError())
         assertEquals("Meal description must be at least 10 characters", result.getErrorMessage())
@@ -133,12 +135,13 @@ class MealValidatorTest {
 
     @Test
     fun `validateMeal should return error for invalid price`() {
-        val meal = MealEntity(
-            name = "Valid Meal",
-            description = "This is a valid description",
-            price = -5.0
-        )
-        
+        val meal =
+            MealEntity(
+                name = "Valid Meal",
+                description = "This is a valid description",
+                price = -5.0,
+            )
+
         val result = MealValidator.validateMeal(meal)
         assertTrue(result.isError())
         assertEquals("Meal price cannot be negative", result.getErrorMessage())
@@ -146,23 +149,25 @@ class MealValidatorTest {
 
     @Test
     fun `validateMealInputs should return success for valid inputs`() {
-        val result = MealValidator.validateMealInputs(
-            name = "Valid Meal",
-            description = "This is a valid description",
-            price = 12.99
-        )
-        
+        val result =
+            MealValidator.validateMealInputs(
+                name = "Valid Meal",
+                description = "This is a valid description",
+                price = 12.99,
+            )
+
         assertTrue(result.isSuccess())
     }
 
     @Test
     fun `validateMealInputs should return error for invalid inputs`() {
-        val result = MealValidator.validateMealInputs(
-            name = "A",
-            description = "Short",
-            price = -5.0
-        )
-        
+        val result =
+            MealValidator.validateMealInputs(
+                name = "A",
+                description = "Short",
+                price = -5.0,
+            )
+
         assertTrue(result.isError())
         assertEquals("Meal name must be at least 2 characters", result.getErrorMessage())
     }
@@ -170,7 +175,7 @@ class MealValidatorTest {
     @Test
     fun `ValidationResult Success should have correct properties`() {
         val result = ValidationResult.Success
-        
+
         assertTrue(result.isSuccess())
         assertFalse(result.isError())
         assertNull(result.getErrorMessage())
@@ -180,7 +185,7 @@ class MealValidatorTest {
     fun `ValidationResult Error should have correct properties`() {
         val errorMessage = "Test error message"
         val result = ValidationResult.Error(errorMessage)
-        
+
         assertFalse(result.isSuccess())
         assertTrue(result.isError())
         assertEquals(errorMessage, result.getErrorMessage())
@@ -190,14 +195,14 @@ class MealValidatorTest {
     fun `validateMealName should handle edge cases`() {
         // Exactly minimum length
         assertTrue(MealValidator.validateMealName("AB").isSuccess())
-        
+
         // Exactly maximum length
         val maxLengthName = "A".repeat(100)
         assertTrue(MealValidator.validateMealName(maxLengthName).isSuccess())
-        
+
         // One character over minimum
         assertTrue(MealValidator.validateMealName("ABC").isSuccess())
-        
+
         // One character under minimum
         assertTrue(MealValidator.validateMealName("A").isError())
     }
@@ -206,14 +211,14 @@ class MealValidatorTest {
     fun `validateMealDescription should handle edge cases`() {
         // Exactly minimum length
         assertTrue(MealValidator.validateMealDescription("1234567890").isSuccess())
-        
+
         // Exactly maximum length
         val maxLengthDescription = "A".repeat(500)
         assertTrue(MealValidator.validateMealDescription(maxLengthDescription).isSuccess())
-        
+
         // One character over minimum
         assertTrue(MealValidator.validateMealDescription("12345678901").isSuccess())
-        
+
         // One character under minimum
         assertTrue(MealValidator.validateMealDescription("123456789").isError())
     }
@@ -222,25 +227,26 @@ class MealValidatorTest {
     fun `validateMealPrice should handle edge cases`() {
         // Exactly minimum price
         assertTrue(MealValidator.validateMealPrice(0.0).isSuccess())
-        
+
         // Exactly maximum price
         assertTrue(MealValidator.validateMealPrice(1000.0).isSuccess())
-        
+
         // Just under minimum
         assertTrue(MealValidator.validateMealPrice(-0.01).isError())
-        
+
         // Just over maximum
         assertTrue(MealValidator.validateMealPrice(1000.01).isError())
     }
 
     @Test
     fun `validateMeal should prioritize name validation`() {
-        val meal = MealEntity(
-            name = "A", // Invalid name
-            description = "Short", // Invalid description
-            price = -5.0 // Invalid price
-        )
-        
+        val meal =
+            MealEntity(
+                name = "A", // Invalid name
+                description = "Short", // Invalid description
+                price = -5.0, // Invalid price
+            )
+
         val result = MealValidator.validateMeal(meal)
         assertTrue(result.isError())
         assertEquals("Meal name must be at least 2 characters", result.getErrorMessage())
@@ -248,12 +254,13 @@ class MealValidatorTest {
 
     @Test
     fun `validateMeal should prioritize description validation after name`() {
-        val meal = MealEntity(
-            name = "Valid Name", // Valid name
-            description = "Short", // Invalid description
-            price = -5.0 // Invalid price
-        )
-        
+        val meal =
+            MealEntity(
+                name = "Valid Name", // Valid name
+                description = "Short", // Invalid description
+                price = -5.0, // Invalid price
+            )
+
         val result = MealValidator.validateMeal(meal)
         assertTrue(result.isError())
         assertEquals("Meal description must be at least 10 characters", result.getErrorMessage())
@@ -261,15 +268,15 @@ class MealValidatorTest {
 
     @Test
     fun `validateMeal should check price validation last`() {
-        val meal = MealEntity(
-            name = "Valid Name", // Valid name
-            description = "This is a valid description", // Valid description
-            price = -5.0 // Invalid price
-        )
-        
+        val meal =
+            MealEntity(
+                name = "Valid Name", // Valid name
+                description = "This is a valid description", // Valid description
+                price = -5.0, // Invalid price
+            )
+
         val result = MealValidator.validateMeal(meal)
         assertTrue(result.isError())
         assertEquals("Meal price cannot be negative", result.getErrorMessage())
     }
 }
-
