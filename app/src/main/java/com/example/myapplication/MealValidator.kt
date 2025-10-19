@@ -3,13 +3,12 @@ package com.example.myapplication
 import com.example.myapplication.database.MealEntity
 
 class MealValidator {
-    
     companion object {
         private const val MIN_NAME_LENGTH = 2
         private const val MIN_DESCRIPTION_LENGTH = 10
         private const val MAX_PRICE = 1000.0
         private const val MIN_PRICE = 0.0
-        
+
         fun validateMealName(name: String): ValidationResult {
             return when {
                 name.isBlank() -> ValidationResult.Error("Meal name cannot be blank")
@@ -18,16 +17,19 @@ class MealValidator {
                 else -> ValidationResult.Success
             }
         }
-        
+
         fun validateMealDescription(description: String): ValidationResult {
             return when {
                 description.isBlank() -> ValidationResult.Error("Meal description cannot be blank")
-                description.trim().length < MIN_DESCRIPTION_LENGTH -> ValidationResult.Error("Meal description must be at least $MIN_DESCRIPTION_LENGTH characters")
+                description.trim().length < MIN_DESCRIPTION_LENGTH ->
+                    ValidationResult.Error(
+                        "Meal description must be at least $MIN_DESCRIPTION_LENGTH characters",
+                    )
                 description.length > 500 -> ValidationResult.Error("Meal description cannot exceed 500 characters")
                 else -> ValidationResult.Success
             }
         }
-        
+
         fun validateMealPrice(price: Double): ValidationResult {
             return when {
                 price < MIN_PRICE -> ValidationResult.Error("Meal price cannot be negative")
@@ -35,30 +37,34 @@ class MealValidator {
                 else -> ValidationResult.Success
             }
         }
-        
+
         fun validateMeal(meal: MealEntity): ValidationResult {
             val nameResult = validateMealName(meal.name)
             if (nameResult is ValidationResult.Error) return nameResult
-            
+
             val descriptionResult = validateMealDescription(meal.description)
             if (descriptionResult is ValidationResult.Error) return descriptionResult
-            
+
             val priceResult = validateMealPrice(meal.price)
             if (priceResult is ValidationResult.Error) return priceResult
-            
+
             return ValidationResult.Success
         }
-        
-        fun validateMealInputs(name: String, description: String, price: Double): ValidationResult {
+
+        fun validateMealInputs(
+            name: String,
+            description: String,
+            price: Double,
+        ): ValidationResult {
             val nameResult = validateMealName(name)
             if (nameResult is ValidationResult.Error) return nameResult
-            
+
             val descriptionResult = validateMealDescription(description)
             if (descriptionResult is ValidationResult.Error) return descriptionResult
-            
+
             val priceResult = validateMealPrice(price)
             if (priceResult is ValidationResult.Error) return priceResult
-            
+
             return ValidationResult.Success
         }
     }
@@ -66,10 +72,12 @@ class MealValidator {
 
 sealed class ValidationResult {
     object Success : ValidationResult()
+
     data class Error(val message: String) : ValidationResult()
-    
+
     fun isSuccess(): Boolean = this is Success
+
     fun isError(): Boolean = this is Error
+
     fun getErrorMessage(): String? = if (this is Error) this.message else null
 }
-

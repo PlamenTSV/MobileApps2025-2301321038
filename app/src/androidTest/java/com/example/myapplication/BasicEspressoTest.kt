@@ -15,7 +15,6 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 class BasicEspressoTest {
-
     @Test
     fun mainActivity_starts_andRootIsDisplayed() {
         ActivityScenario.launch(MainActivity::class.java).use {
