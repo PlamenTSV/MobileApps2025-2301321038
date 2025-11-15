@@ -29,11 +29,6 @@
 - Изисквания: Android Studio (Koala или по-нова), JDK 21+ (препоръчително 21), Android SDK.
 - Отворете проекта в Android Studio → изчакайте Gradle Sync → Run на устройство/емулатор.
 
-### Скрийншотове
-Добавете изображенията в `docs/screenshots/` и ги именувайте както следва, след което обновете пътищата при нужда:
-- Главен екран: `![Main](docs/screenshots/main.png)`
-- Добавяне на ястие: `![Add Meal](docs/screenshots/add_meal.png)`
-- Детайли за ястие: `![Details](docs/screenshots/details.png)`
 
 ### APK
 - Пряка връзка: [apk/app-release.apk](/apk/app-release.apk)
